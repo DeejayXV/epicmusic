@@ -1,5 +1,6 @@
 package com.epicmusic.services;
 
+import com.epicmusic.dto.TrackDTO;
 import com.epicmusic.entities.Track;
 import com.epicmusic.repositories.TrackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class TrackService {
         return trackRepository.findAll();
     }
 
-    public Track createTrack(Track track) {
+    public Track createTrack(TrackDTO track) {
         return trackRepository.save(track);
     }
 
