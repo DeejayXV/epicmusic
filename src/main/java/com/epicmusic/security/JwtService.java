@@ -16,22 +16,26 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    private String secretKey;
 
+    // Metodo per ottenere la chiave di firma
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey); // Decodifica della chiave in Base64
+        return Keys.hmacShaKeyFor(keyBytes); // Genera la chiave per HS256
     }
 
+    // Estrai il nome utente dal token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    // Estrai un claim generico dal token
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
+    // Estrai tutti i claims dal token
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -40,24 +44,28 @@ public class JwtService {
                 .getBody();
     }
 
+    // Genera un token per l'utente specificato
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10h
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // Scadenza 10 ore
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    // Valida il token confrontando nome utente ed eventuale scadenza
     public boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
 
+    // Verifica se il token è scaduto
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
+    // Estrai la data di scadenza dal token
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
