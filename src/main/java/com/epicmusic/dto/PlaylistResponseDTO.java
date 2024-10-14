@@ -1,5 +1,10 @@
 package com.epicmusic.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class PlaylistResponseDTO {
     private Long id;
     private String name;
@@ -10,4 +15,5 @@ public class PlaylistResponseDTO {
         this.name = name;
         this.username = username;
     }
+
 }
