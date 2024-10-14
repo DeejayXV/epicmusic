@@ -6,6 +6,8 @@ import com.epicmusic.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.epicmusic.exception.InvalidPasswordException;
+
 
 @Service
 public class UserService {
