@@ -1,6 +1,6 @@
 package com.epicmusic.controllers;
 
-import com.epicmusic.dto.AuthRequest;
+import com.epicmusic.dto.AuthenticationRequest;
 import com.epicmusic.security.JwtService;
 import com.epicmusic.exception.AuthenticationFailureException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class LoginController {
     private JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<String> login(@RequestBody AuthenticationRequest authRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
