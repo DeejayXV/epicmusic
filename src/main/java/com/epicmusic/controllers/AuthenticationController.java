@@ -6,6 +6,7 @@ import com.epicmusic.dto.RegisterRequest;
 import com.epicmusic.entities.User;
 import com.epicmusic.repositories.UserRepository;
 import com.epicmusic.security.JwtService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,9 @@ public class AuthenticationController {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("Email già in uso");
         }
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("Username già in uso");
+        }
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -32,6 +36,9 @@ public class AuthenticationController {
         userRepository.save(user);
         return ResponseEntity.ok("Utente registrato con successo");
     }
+
+
+
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
