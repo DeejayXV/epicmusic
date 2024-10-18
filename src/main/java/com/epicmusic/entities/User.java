@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 @Entity
+@Table(name = "app_user")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
