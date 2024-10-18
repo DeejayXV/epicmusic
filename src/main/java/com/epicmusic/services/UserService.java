@@ -2,12 +2,12 @@ package com.epicmusic.services;
 
 import com.epicmusic.dto.UserDTO;
 import com.epicmusic.entities.User;
+import com.epicmusic.entities.Role;
 import com.epicmusic.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.epicmusic.exception.InvalidPasswordException;
-
 
 @Service
 public class UserService {
@@ -24,6 +24,7 @@ public class UserService {
         user.setEmail(userDTO.getEmail());
         validatePassword(userDTO.getPassword());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setRole(Role.valueOf(userDTO.getRole().toUpperCase()));
         return userRepository.save(user);
     }
 
