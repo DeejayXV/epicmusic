@@ -10,15 +10,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping("/users/register")
     public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserDTO userDTO) {
         User user = userService.register(userDTO);
         return new ResponseEntity<>(new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail()), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<String> adminEndpoint() {
+        return new ResponseEntity<>("Admin access granted", HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<String> userEndpoint() {
+        return new ResponseEntity<>("User access granted", HttpStatus.OK);
     }
 }
