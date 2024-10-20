@@ -37,7 +37,9 @@ public class AuthenticationController {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
-        return ResponseEntity.ok("Utente registrato con successo");
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getUsername());
+        String token = jwtService.generateToken(userDetails);
+        return ResponseEntity.ok(new AuthenticationResponse(token));
     }
 
     @PostMapping("/login")
