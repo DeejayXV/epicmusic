@@ -1,43 +1,50 @@
 package com.epicmusic.controllers;
 
-import com.epicmusic.dto.PlaylistDTO;
-import com.epicmusic.dto.PlaylistResponseDTO;
 import com.epicmusic.entities.Playlist;
 import com.epicmusic.services.PlaylistService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/playlists")
+@RequiredArgsConstructor
 public class PlaylistController {
 
-    @Autowired
-    private PlaylistService playlistService;
-
-    @GetMapping
-    public List<PlaylistResponseDTO> getAllPlaylists() {
-        return playlistService.getAllPlaylists().stream()
-                .map(playlist -> new PlaylistResponseDTO(playlist.getId(), playlist.getName(), playlist.getUser().getUsername()))
-                .collect(Collectors.toList());
-    }
+    private final PlaylistService playlistService;
 
     @PostMapping
-    public PlaylistResponseDTO createPlaylist(@RequestBody PlaylistDTO playlistDTO) {
-        Playlist playlist = playlistService.createPlaylist(playlistDTO);
-        return new PlaylistResponseDTO(playlist.getId(), playlist.getName(), playlist.getUser().getUsername());
+    public ResponseEntity<?> createPlaylist(@RequestBody Playlist playlist, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+        Playlist createdPlaylist = playlistService.createPlaylist(principal.getName(), playlist.getName(), playlist.getDescription());
+        return ResponseEntity.ok(createdPlaylist);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePlaylist(@PathVariable Long id) {
-        if (playlistService.playlistExists(id)) {
-            playlistService.deletePlaylist(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+    @GetMapping
+    public ResponseEntity<?> getPlaylists(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
         }
+        List<Playlist> playlists = playlistService.getPlaylistsByUser(principal.getName());
+        return ResponseEntity.ok(playlists);
     }
+
+    @PutMapping("/{playlistId}")
+    public ResponseEntity<Playlist> updatePlaylist(@PathVariable Long playlistId, @RequestBody Playlist playlist) {
+        Playlist updatedPlaylist = playlistService.updatePlaylist(playlistId, playlist.getName(), playlist.getDescription());
+        return ResponseEntity.ok(updatedPlaylist);
+    }
+
+    @DeleteMapping("/{playlistId}")
+    public ResponseEntity<Void> deletePlaylist(@PathVariable Long playlistId) {
+        playlistService.deletePlaylist(playlistId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

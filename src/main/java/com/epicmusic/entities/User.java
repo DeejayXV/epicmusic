@@ -35,7 +35,10 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        if (this.role == null) {
+            throw new IllegalStateException("Il ruolo non può essere null per l'utente " + this.getUsername());
+        }
+        return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
 
     @Override

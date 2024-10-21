@@ -27,20 +27,20 @@ public class UserService {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+    // Metodo per registrare un nuovo utente con i dettagli forniti
     public User register(UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         validatePassword(userDTO.getPassword());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(Role.valueOf(userDTO.getRole().toUpperCase()));
+        user.setRole(userDTO.getRole() != null ? Role.valueOf(userDTO.getRole().toUpperCase()) : Role.USER);
 
-        // Salva l'utente nel repository
-        userRepository.save(user);
-
-        return user;
+        return userRepository.save(user);
     }
 
+
+    // Metodo per autenticare l'utente e generare un token JWT
     public String authenticate(String username, String password) {
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
@@ -49,6 +49,7 @@ public class UserService {
         return jwtService.generateToken(userDetails);
     }
 
+    // Metodo per validare la password durante la registrazione
     private void validatePassword(String password) {
         if (password.length() < 8) {
             throw new InvalidPasswordException("Password must be at least 8 characters long");
@@ -57,4 +58,15 @@ public class UserService {
             throw new InvalidPasswordException("Password must contain at least one uppercase letter, one lowercase letter, and one digit");
         }
     }
+
+    // Metodo per creare un utente con un ruolo di default USER (es. per utenti non registrati da un admin)
+    public User createUser(String username, String password, String email) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password)); // Codifica la password
+        user.setEmail(email);
+        user.setRole(Role.USER); // Assegna un ruolo di default (USER)
+        return userRepository.save(user);
+    }
+
 }

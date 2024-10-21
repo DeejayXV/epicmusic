@@ -31,26 +31,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = null;
         String username = null;
 
-        // Estrai il token JWT dall'header Authorization
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
-            username = jwtService.extractUsername(jwt);
+            try {
+                username = jwtService.extractUsername(jwt);
+                System.out.println("Extracted JWT: " + jwt);
+                System.out.println("Extracted Username: " + username);
+            } catch (Exception e) {
+                System.out.println("Errore durante l'estrazione del JWT: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Header di autorizzazione non valido o mancante.");
         }
 
-        // Se il JWT e lo username sono validi e l'utente non è ancora autenticato
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Carica i dettagli dell'utente
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        System.out.println("Auth Header: " + authHeader);
+        System.out.println("JWT: " + jwt);
+        System.out.println("Username estratto: " + username);
 
-            // Verifica se il token è valido
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             if (jwtService.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("Utente autenticato con successo: " + username);
+            } else {
+                System.out.println("Token JWT non valido per l'utente " + username);
+            }
+        } else {
+            if (username == null) {
+                System.out.println("Username nullo, impossibile autenticare.");
+            } else {
+                System.out.println("L'autenticazione esiste già nel SecurityContext.");
             }
         }
-        // Prosegui con il prossimo filtro nella catena
+
         filterChain.doFilter(request, response);
     }
+
+
+
 }

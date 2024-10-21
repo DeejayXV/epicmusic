@@ -1,9 +1,9 @@
 package com.epicmusic.services;
 
-import com.epicmusic.dto.PlaylistDTO;
 import com.epicmusic.entities.Playlist;
-import com.epicmusic.exception.ResourceNotFoundException;
+import com.epicmusic.entities.User;
 import com.epicmusic.repositories.PlaylistRepository;
+import com.epicmusic.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,24 +15,39 @@ public class PlaylistService {
     @Autowired
     private PlaylistRepository playlistRepository;
 
-    public List<Playlist> getAllPlaylists() {
-        return playlistRepository.findAll();
-    }
+    @Autowired
+    private UserRepository userRepository;
 
-    public Playlist createPlaylist(PlaylistDTO playlistDTO) {
+    public Playlist createPlaylist(String username, String name, String description) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         Playlist playlist = new Playlist();
-        playlist.setName(playlistDTO.getName());
+        playlist.setUser(user);
+        playlist.setName(name);
+        playlist.setDescription(description);
         return playlistRepository.save(playlist);
     }
 
-    public void deletePlaylist(Long id) {
-        if (!playlistRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Playlist with id " + id + " not found");
-        }
-        playlistRepository.deleteById(id);
+    public List<Playlist> getPlaylistsByUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return playlistRepository.findByUserId(user.getId());
     }
 
-    public boolean playlistExists(Long id) {
-        return playlistRepository.existsById(id);
+    public Playlist updatePlaylist(Long playlistId, String name, String description) {
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("Playlist not found"));
+
+        playlist.setName(name);
+        playlist.setDescription(description);
+        return playlistRepository.save(playlist);
+    }
+
+    public void deletePlaylist(Long playlistId) {
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new RuntimeException("Playlist not found"));
+
+        playlistRepository.delete(playlist);
     }
 }
