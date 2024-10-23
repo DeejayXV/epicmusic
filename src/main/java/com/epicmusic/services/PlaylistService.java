@@ -32,7 +32,7 @@ public class PlaylistService {
     public List<Playlist> getPlaylistsByUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return playlistRepository.findByUserId(user.getId());
+        return playlistRepository.findByUser(user);
     }
 
     public Playlist updatePlaylist(Long playlistId, String name, String description) {
