@@ -1,9 +1,9 @@
 package com.epicmusic.repositories;
 
-import com.epicmusic.entities.Track;
+import com.epicmusic.entities.Album;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TrackRepository extends JpaRepository<Track, Long> {
+public interface AlbumRepository extends JpaRepository<Album, Long> {
 }
