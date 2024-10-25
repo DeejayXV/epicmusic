@@ -6,7 +6,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class TrackResponseDTO {
-    // Getter e Setter
     private Long id;
     private String title;
     private String artist;
