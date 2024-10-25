@@ -15,6 +15,4 @@ public class Album {
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     private List<Track> tracks;
 
-    // Getters and setters
-    // Constructors, including no-arg
 }

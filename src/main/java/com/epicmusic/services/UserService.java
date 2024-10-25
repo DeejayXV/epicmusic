@@ -63,9 +63,9 @@ public class UserService {
     public User createUser(String username, String password, String email) {
         User user = new User();
         user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password)); // Codifica la password
+        user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
-        user.setRole(Role.USER); // Assegna un ruolo di default (USER)
+        user.setRole(Role.USER);
         return userRepository.save(user);
     }
 

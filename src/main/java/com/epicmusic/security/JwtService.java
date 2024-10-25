@@ -55,7 +55,6 @@ public class JwtService {
                 .compact();
     }
 
-    // Valida il token confrontando nome utente ed eventuale scadenza
     public boolean validateToken(String token, UserDetails userDetails) {
         final String extractedUsername = extractUsername(token);
         boolean isValid = (extractedUsername.equals(userDetails.getUsername()) && !isTokenExpired(token));
@@ -63,14 +62,10 @@ public class JwtService {
         return isValid;
     }
 
-
-
-    // Verifica se il token è scaduto
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    // Estrai la data di scadenza dal token
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
